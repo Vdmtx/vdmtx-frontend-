@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Downloader & Transcriber</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #121212; color: #e0e0e0; }
+        h1 { text-align: center; color: #bb86fc; }
+        input, button { padding: 12px; width: 100%; margin-bottom: 10px; border-radius: 6px; border: 1px solid #333; box-sizing: border-box; font-size: 16px; }
+        input { background: #1e1e1e; color: #fff; }
+        button { background: #bb86fc; color: #000; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; }
+        button:hover { background: #9955e8; }
+        .btn-group { display: flex; gap: 10px; }
+        .btn-group button { flex: 1; }
+        #result { margin-top: 20px; padding: 15px; background: #1e1e1e; border-radius: 6px; white-space: pre-wrap; min-height: 50px; display: none; }
+    </style>
+</head>
+<body>
+    <h1>Multi-Platform Downloader</h1>
+    <input type="text" id="url" placeholder="Cole a URL (YouTube, TikTok, Kwai, etc)">
+    
+    <div class="btn-group">
+        <button onclick="downloadVideo('mp4')">MP4</button>
+        <button onclick="downloadVideo('mp3')">MP3</button>
+    </div>
+    <button onclick="transcribeVideo()" style="background: #03dac6; color: #000;">Transcrever Áudio</button>
+    
+    <div id="result"></div>
+
+    <script>
+        // ⚠️ ALTERE PARA A URL DO SEU BACKEND DEPLOYADO (Ex: https://seu-app.onrender.com)
+        const API_URL = "https://SEU-BACKEND-URL.onrender.com";
+
+        const resultDiv = document.getElementById('result');
+
+        function showResult(msg, isError = false) {
+            resultDiv.style.display = 'block';
+            resultDiv.innerText = msg;
+            resultDiv.style.color = isError ? '#cf6679' : '#e0e0e0';
+        }
+
+        async function downloadVideo(format) {
+            const url = document.getElementById('url').value;
+            if (!url) return showResult("Insira uma URL.", true);
+            
+            showResult("Processando download...");
+            window.location.href = `${API_URL}/download?url=${encodeURIComponent(url)}&format=${format}`;
+            setTimeout(() => showResult("Download iniciado no navegador."), 1000);
+        }
+
+        async function transcribeVideo() {
+            const url = document.getElementById('url').value;
+            if (!url) return showResult("Insira uma URL.", true);
+            
+            showResult("Baixando áudio e transcrevendo (pode demorar)...");
+            try {
+                const res = await fetch(`${API_URL}/transcribe?url=${encodeURIComponent(url)}`);
+                const data = await res.json();
+                if (data.error) return showResult("Erro: " + data.error, true);
+                showResult(data.text);
+            } catch (e) {
+                showResult("Erro de conexão com o backend.", true);
+            }
+        }
+    </script>
+</body>
+</html>
