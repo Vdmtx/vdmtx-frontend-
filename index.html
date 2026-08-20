@@ -11,94 +11,129 @@
             background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
             color: #e0e0e0; 
             min-height: 100vh;
+            padding: 20px;
         }
+        .container { max-width: 700px; margin: 0 auto; }
         .header {
-            background: rgba(255, 0, 0, 0.15);
-            padding: 24px 20px;
-            border-bottom: 1px solid rgba(255, 0, 0, 0.3);
             text-align: center;
+            padding: 30px 0;
+            border-bottom: 2px solid rgba(255,0,0,0.3);
+            margin-bottom: 30px;
         }
-        .logo { font-size: 32px; font-weight: 800; color: #ff0000; }
-        .container { padding: 20px; max-width: 700px; margin: 0 auto; }
+        .logo { font-size: 36px; font-weight: 800; color: #ff0000; margin-bottom: 8px; }
+        .tagline { color: #888; font-size: 14px; }
+        
         .alert {
-            background: #ff6b6b;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
             color: #fff;
-            padding: 16px;
+            padding: 20px;
             border-radius: 12px;
-            margin-bottom: 16px;
-            display: none;
+            margin-bottom: 20px;
+            line-height: 1.6;
         }
-        .alert.show { display: block; }
+        .alert strong { display: block; margin-bottom: 10px; font-size: 16px; }
+        .alert ol { margin-left: 20px; }
+        .alert a { color: #fff; text-decoration: underline; }
+        
         input, textarea {
             width: 100%;
             padding: 16px;
             background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.1);
             border-radius: 12px;
             color: #fff;
-            margin-bottom: 12px;
             font-size: 15px;
+            margin-bottom: 15px;
         }
-        textarea { min-height: 120px; font-family: monospace; font-size: 11px; display: none; }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #ff0000;
+        }
+        textarea { 
+            min-height: 150px; 
+            font-family: monospace; 
+            font-size: 11px;
+            display: none;
+        }
         textarea.show { display: block; }
+        
         .btn {
             width: 100%;
             padding: 18px;
             border: none;
             border-radius: 12px;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            transition: transform 0.2s;
         }
-        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn:hover { transform: translateY(-2px); }
+        .btn:active { transform: translateY(0); }
         .btn-red { background: linear-gradient(135deg, #ff0000, #cc0000); color: #fff; }
         .btn-cyan { background: linear-gradient(135deg, #03dac6, #00b4a0); color: #000; }
-        .btn-gold { background: linear-gradient(135deg, #ffd700, #ffb700); color: #000; }
+        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        
         .result {
             background: rgba(255,255,255,0.05);
             padding: 20px;
             border-radius: 12px;
             margin-top: 20px;
             display: none;
+            border: 1px solid rgba(255,255,255,0.1);
         }
         .result.show { display: block; }
-        .spinner { 
-            display: inline-block; 
-            width: 20px; height: 20px; 
-            border: 3px solid rgba(255,0,0,0.3); 
-            border-top-color: #ff0000; 
-            border-radius: 50%; 
-            animation: spin 0.8s linear infinite; 
+        .result-title { color: #ff0000; font-weight: 600; margin-bottom: 12px; }
+        .result-text { white-space: pre-wrap; line-height: 1.6; }
+        
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .status-ok { background: #00c853; color: #000; }
+        .status-warn { background: #ffd700; color: #000; }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px; height: 20px;
+            border: 3px solid rgba(255,0,0,0.3);
+            border-top-color: #ff0000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">▶️ VidMTX</div>
-        <div style="color:#888;margin-top:6px">YouTube Downloader Pro</div>
-    </div>
-    
     <div class="container">
-        <div class="alert" id="alert">
-            <strong>YouTube requer cookies:</strong><br>
-            1. Instale "Get cookies.txt" no Chrome<br>
-            2. Acesse youtube.com<br>
-            3. Exporte cookies e cole abaixo
+        <div class="header">
+            <div class="logo">▶️ VidMTX <span id="status" class="status status-warn">Sem cookies</span></div>
+            <div class="tagline">YouTube Downloader Pro • Invidious + yt-dlp</div>
         </div>
         
-        <input type="url" id="url" placeholder="🔗 URL do YouTube">
+        <div class="alert">
+            <strong> Cookies OBRIGATÓRIOS para YouTube:</strong>
+            <ol>
+                <li>Instale: <a href="https://chromewebstore.google.com/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc" target="_blank">Get cookies.txt</a></li>
+                <li>Acesse youtube.com e faça login</li>
+                <li>Clique na extensão → Exportar cookies</li>
+                <li>Copie TODO o conteúdo OU importe o arquivo</li>
+                <li>Cole no campo abaixo</li>
+            </ol>
+        </div>
         
-        <button class="btn" style="background:rgba(255,255,255,0.1);color:#fff" onclick="toggleCookies()">
-            🍪 Adicionar Cookies (obrigatório)
-        </button>
+        <input type="url" id="url" placeholder="🔗 https://youtube.com/watch?v=...">
         
-        <textarea id="cookies" placeholder="Cole os cookies aqui..."></textarea>
+        <textarea id="cookies" placeholder="Cole os cookies aqui (Netscape HTTP Cookie File...)"></textarea>
         
         <div class="btn-row">
-            <button class="btn btn-red" onclick="download('mp4')">📥 MP4</button>
-            <button class="btn btn-red" onclick="download('mp3')">🎵 MP3</button>
+            <button class="btn btn-red" onclick="download('mp4')">📥 Download MP4</button>
+            <button class="btn btn-red" onclick="download('mp3')">🎵 Download MP3</button>
         </div>
         <div class="btn-row">
             <button class="btn btn-cyan" onclick="transcribe()">📝 Transcrever</button>
@@ -111,32 +146,37 @@
     <script>
         const API = "https://vdmtx-backend.onrender.com";
         
-        function toggleCookies() {
-            const t = document.getElementById('cookies');
-            const a = document.getElementById('alert');
-            t.classList.toggle('show');
-            a.classList.toggle('show');
+        function checkCookies() {
+            const cookies = document.getElementById('cookies').value;
+            const status = document.getElementById('status');
+            if (cookies.length > 500) {
+                status.textContent = 'Cookies OK';
+                status.className = 'status status-ok';
+            } else {
+                status.textContent = 'Sem cookies';
+                status.className = 'status status-warn';
+            }
+            return cookies;
         }
         
         function showResult(msg, err=false) {
             const r = document.getElementById('result');
             r.classList.add('show');
-            r.innerHTML = msg;
-            r.style.color = err ? '#ff6b6b' : '#e0e0e0';
+            r.innerHTML = `<div class="result-title">${err ? ' Erro' : '✅ Resultado'}</div><div class="result-text">${msg}</div>`;
         }
         
         async function download(fmt) {
             const url = document.getElementById('url').value.trim();
-            const cookies = document.getElementById('cookies').value.trim();
+            const cookies = checkCookies();
             
-            if (!url) return alert('Cole uma URL');
-            if (!cookies || cookies.length < 100) {
-                alert('Adicione cookies primeiro!');
-                toggleCookies();
+            if (!url) return alert('Cole uma URL do YouTube');
+            if (cookies.length < 500) {
+                alert('⚠️ Cole os cookies primeiro (campo abaixo)');
+                document.getElementById('cookies').classList.add('show');
                 return;
             }
             
-            showResult('<span class="spinner"></span> Baixando...');
+            showResult('<span class="spinner"></span>Processando...');
             
             try {
                 const r = await fetch(`${API}/download`, {
@@ -151,23 +191,26 @@
                     a.href = URL.createObjectURL(blob);
                     a.download = `video.${fmt}`;
                     a.click();
-                    showResult('✅ Download concluído!');
+                    showResult('Download iniciado! Verifique sua pasta de downloads.');
                 } else {
                     const e = await r.json();
-                    showResult(`❌ ${e.detail}`, true);
+                    showResult(e.detail, true);
                 }
             } catch(e) {
-                showResult('❌ Erro de conexão', true);
+                showResult('Erro de conexão', true);
             }
         }
         
         async function transcribe() {
             const url = document.getElementById('url').value.trim();
-            const cookies = document.getElementById('cookies').value.trim();
+            const cookies = checkCookies();
             
-            if (!url || cookies.length < 100) return alert('Preencha URL e cookies');
+            if (!url || cookies.length < 500) {
+                alert('Preencha URL e cookies');
+                return;
+            }
             
-            showResult('<span class="spinner"></span> Transcrevendo...');
+            showResult('<span class="spinner"></span>Baixando e transcrevendo...');
             
             try {
                 const r = await fetch(`${API}/transcribe`, {
@@ -178,21 +221,24 @@
                 
                 const d = await r.json();
                 if (d.formatted) {
-                    showResult('<strong>Transcrição:</strong><br><br>' + d.formatted);
+                    showResult(`<strong>Transcrição:</strong><br><br>${d.formatted}`);
                     navigator.clipboard.writeText(d.formatted);
                 } else if (d.detail) {
-                    showResult(`❌ ${d.detail}`, true);
+                    showResult(d.detail, true);
                 }
             } catch(e) {
-                showResult('❌ Erro', true);
+                showResult('Erro de conexão', true);
             }
         }
         
         async function downloadTxt() {
             const url = document.getElementById('url').value.trim();
-            const cookies = document.getElementById('cookies').value.trim();
+            const cookies = checkCookies();
             
-            if (!url || cookies.length < 100) return alert('Preencha URL e cookies');
+            if (!url || cookies.length < 500) {
+                alert('Preencha URL e cookies');
+                return;
+            }
             
             const r = await fetch(`${API}/download-transcription`, {
                 method: 'POST',
@@ -208,6 +254,8 @@
                 a.click();
             }
         }
+        
+        document.getElementById('cookies').addEventListener('input', checkCookies);
     </script>
 </body>
 </html>
