@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Downloader & Transcriber</title>
+    <title>Multi-Platform Downloader</title>
     <style>
         body { font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #121212; color: #e0e0e0; }
         h1 { text-align: center; color: #bb86fc; }
@@ -14,24 +14,23 @@
         .btn-group { display: flex; gap: 10px; }
         .btn-group button { flex: 1; }
         #result { margin-top: 20px; padding: 15px; background: #1e1e1e; border-radius: 6px; white-space: pre-wrap; min-height: 50px; display: none; }
+        .loading { color: #bb86fc; }
     </style>
 </head>
 <body>
-    <h1>Multi-Platform Downloader</h1>
-    <input type="text" id="url" placeholder="Cole a URL (YouTube, TikTok, Kwai, etc)">
+    <h1>🎥 Multi-Platform Downloader</h1>
+    <input type="text" id="url" placeholder="Cole a URL (YouTube, TikTok, Kwai, Douyin, Bilibili, etc)">
     
     <div class="btn-group">
-        <button onclick="downloadVideo('mp4')">MP4</button>
-        <button onclick="downloadVideo('mp3')">MP3</button>
+        <button onclick="downloadVideo('mp4')">📥 Download MP4</button>
+        <button onclick="downloadVideo('mp3')">🎵 Download MP3</button>
     </div>
-    <button onclick="transcribeVideo()" style="background: #03dac6; color: #000;">Transcrever Áudio</button>
+    <button onclick="transcribeVideo()" style="background: #03dac6; color: #000;"> Transcrever Áudio</button>
     
     <div id="result"></div>
 
     <script>
-        // ⚠️ ALTERE PARA A URL DO SEU BACKEND DEPLOYADO (Ex: https://seu-app.onrender.com)
-        const API_URL = "https://SEU-BACKEND-URL.onrender.com";
-
+        const API_URL = "https://vdmtx-backend.onrender.com";
         const resultDiv = document.getElementById('result');
 
         function showResult(msg, isError = false) {
@@ -42,25 +41,29 @@
 
         async function downloadVideo(format) {
             const url = document.getElementById('url').value;
-            if (!url) return showResult("Insira uma URL.", true);
+            if (!url) return showResult("⚠️ Insira uma URL válida.", true);
             
-            showResult("Processando download...");
+            showResult("⏳ Processando download...");
             window.location.href = `${API_URL}/download?url=${encodeURIComponent(url)}&format=${format}`;
-            setTimeout(() => showResult("Download iniciado no navegador."), 1000);
+            setTimeout(() => showResult("✅ Download iniciado! Verifique sua pasta de downloads."), 1000);
         }
 
         async function transcribeVideo() {
             const url = document.getElementById('url').value;
-            if (!url) return showResult("Insira uma URL.", true);
+            if (!url) return showResult("️ Insira uma URL válida.", true);
             
-            showResult("Baixando áudio e transcrevendo (pode demorar)...");
+            showResult("⏳ Baixando áudio e transcrevendo (pode demorar)...");
             try {
                 const res = await fetch(`${API_URL}/transcribe?url=${encodeURIComponent(url)}`);
                 const data = await res.json();
-                if (data.error) return showResult("Erro: " + data.error, true);
-                showResult(data.text);
+                if (data.detail) return showResult(`❌ Erro: ${data.detail}`, true);
+                if (data.text) {
+                    showResult("📝 Transcrição:\n\n" + data.text);
+                } else {
+                    showResult("❌ Erro desconhecido", true);
+                }
             } catch (e) {
-                showResult("Erro de conexão com o backend.", true);
+                showResult("❌ Erro de conexão. O servidor pode estar iniciando (aguarde 30s e tente novamente).", true);
             }
         }
     </script>
