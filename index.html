@@ -5,27 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multi-Platform Downloader</title>
     <style>
-        body { font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #121212; color: #e0e0e0; }
+        body { font-family: system-ui, sans-serif; max-width: 700px; margin: 40px auto; padding: 20px; background: #121212; color: #e0e0e0; }
         h1 { text-align: center; color: #bb86fc; }
-        input, button { padding: 12px; width: 100%; margin-bottom: 10px; border-radius: 6px; border: 1px solid #333; box-sizing: border-box; font-size: 16px; }
-        input { background: #1e1e1e; color: #fff; }
+        input, textarea, button { padding: 12px; width: 100%; margin-bottom: 10px; border-radius: 6px; border: 1px solid #333; box-sizing: border-box; font-size: 14px; }
+        input, textarea { background: #1e1e1e; color: #fff; }
+        textarea { min-height: 80px; resize: vertical; font-family: monospace; font-size: 12px; }
         button { background: #bb86fc; color: #000; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; }
         button:hover { background: #9955e8; }
         .btn-group { display: flex; gap: 10px; }
         .btn-group button { flex: 1; }
         #result { margin-top: 20px; padding: 15px; background: #1e1e1e; border-radius: 6px; white-space: pre-wrap; min-height: 50px; display: none; }
-        .loading { color: #bb86fc; }
+        .info-box { background: #1e3a5f; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 13px; }
+        .info-box a { color: #03dac6; }
+        .error { color: #cf6679; }
+        .success { color: #03dac6; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #bb86fc; }
+        .toggle-cookies { background: #333; color: #fff; padding: 8px; border: none; cursor: pointer; font-size: 12px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
     <h1>🎥 Multi-Platform Downloader</h1>
-    <input type="text" id="url" placeholder="Cole a URL (YouTube, TikTok, Kwai, Douyin, Bilibili, etc)">
+    
+    <div class="info-box">
+        <strong>⚠️ YouTube bloqueando?</strong><br>
+        Instale a extensão <a href="https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc" target="_blank">Get cookies.txt</a>, 
+        acesse youtube.com, exporte os cookies e cole abaixo (opcional).
+    </div>
+
+    <input type="text" id="url" placeholder="Cole a URL (YouTube, TikTok, Kwai, Douyin, etc)">
+    
+    <button class="toggle-cookies" onclick="toggleCookies()"> Cookies (opcional)</button>
+    <div id="cookiesSection" style="display: none;">
+        <label>Cookies do YouTube (exporte do navegador):</label>
+        <textarea id="cookies" placeholder="Netscape HTTP Cookie File..."></textarea>
+    </div>
     
     <div class="btn-group">
         <button onclick="downloadVideo('mp4')">📥 Download MP4</button>
         <button onclick="downloadVideo('mp3')">🎵 Download MP3</button>
     </div>
-    <button onclick="transcribeVideo()" style="background: #03dac6; color: #000;"> Transcrever Áudio</button>
+    <button onclick="transcribeVideo()" style="background: #03dac6; color: #000;">📝 Transcrever Áudio</button>
     
     <div id="result"></div>
 
@@ -33,34 +52,59 @@
         const API_URL = "https://vdmtx-backend.onrender.com";
         const resultDiv = document.getElementById('result');
 
+        function toggleCookies() {
+            const section = document.getElementById('cookiesSection');
+            section.style.display = section.style.display === 'none' ? 'block' : 'none';
+        }
+
         function showResult(msg, isError = false) {
             resultDiv.style.display = 'block';
-            resultDiv.innerText = msg;
-            resultDiv.style.color = isError ? '#cf6679' : '#e0e0e0';
+            resultDiv.innerHTML = msg;
+            resultDiv.className = isError ? 'error' : 'success';
         }
 
         async function downloadVideo(format) {
             const url = document.getElementById('url').value;
+            const cookies = document.getElementById('cookies').value;
+            
             if (!url) return showResult("⚠️ Insira uma URL válida.", true);
             
             showResult("⏳ Processando download...");
-            window.location.href = `${API_URL}/download?url=${encodeURIComponent(url)}&format=${format}`;
+            
+            let downloadUrl = `${API_URL}/download?url=${encodeURIComponent(url)}&format=${format}`;
+            if (cookies) {
+                downloadUrl += `&cookies=${encodeURIComponent(cookies)}`;
+            }
+            
+            window.location.href = downloadUrl;
             setTimeout(() => showResult("✅ Download iniciado! Verifique sua pasta de downloads."), 1000);
         }
 
         async function transcribeVideo() {
             const url = document.getElementById('url').value;
-            if (!url) return showResult("️ Insira uma URL válida.", true);
+            const cookies = document.getElementById('cookies').value;
+            
+            if (!url) return showResult("⚠️ Insira uma URL válida.", true);
             
             showResult("⏳ Baixando áudio e transcrevendo (pode demorar)...");
+            
+            let transcribeUrl = `${API_URL}/transcribe?url=${encodeURIComponent(url)}`;
+            if (cookies) {
+                transcribeUrl += `&cookies=${encodeURIComponent(cookies)}`;
+            }
+            
             try {
-                const res = await fetch(`${API_URL}/transcribe?url=${encodeURIComponent(url)}`);
+                const res = await fetch(transcribeUrl);
                 const data = await res.json();
-                if (data.detail) return showResult(`❌ Erro: ${data.detail}`, true);
+                
+                if (data.error) {
+                    return showResult(`❌ ${data.error}<br><br>${data.solution || ''}<br>${data.solution2 || ''}<br>${data.solution3 || ''}`, true);
+                }
+                if (data.detail) {
+                    return showResult(`❌ Erro: ${data.detail}`, true);
+                }
                 if (data.text) {
-                    showResult("📝 Transcrição:\n\n" + data.text);
-                } else {
-                    showResult("❌ Erro desconhecido", true);
+                    showResult("📝 <strong>Transcrição:</strong><br><br>" + data.text);
                 }
             } catch (e) {
                 showResult("❌ Erro de conexão. O servidor pode estar iniciando (aguarde 30s e tente novamente).", true);
