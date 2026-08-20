@@ -4,10 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0a0a0a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>VidMTX - Downloader Pro</title>
-    <link rel="manifest" href="manifest.json">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { 
@@ -17,7 +14,6 @@
             min-height: 100vh;
             padding-bottom: 80px;
         }
-        
         .header {
             background: rgba(187, 134, 252, 0.1);
             backdrop-filter: blur(10px);
@@ -27,7 +23,6 @@
             top: 0;
             z-index: 100;
         }
-        
         .logo {
             font-size: 28px;
             font-weight: 800;
@@ -37,16 +32,8 @@
             text-align: center;
             letter-spacing: -1px;
         }
-        
-        .tagline {
-            text-align: center;
-            font-size: 12px;
-            color: #888;
-            margin-top: 4px;
-        }
-        
+        .tagline { text-align: center; font-size: 12px; color: #888; margin-top: 4px; }
         .container { padding: 16px; max-width: 600px; margin: 0 auto; }
-        
         .input-group {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 16px;
@@ -54,7 +41,6 @@
             margin-bottom: 16px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
         input {
             width: 100%;
             padding: 16px;
@@ -64,9 +50,7 @@
             font-size: 15px;
             outline: none;
         }
-        
         input::placeholder { color: #666; }
-        
         .platforms {
             display: flex;
             gap: 8px;
@@ -75,9 +59,7 @@
             margin-bottom: 16px;
             scrollbar-width: none;
         }
-        
         .platforms::-webkit-scrollbar { display: none; }
-        
         .platform-chip {
             background: rgba(255, 255, 255, 0.08);
             padding: 8px 14px;
@@ -87,14 +69,12 @@
             color: #aaa;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
         .actions {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
             margin-bottom: 10px;
         }
-        
         .btn {
             padding: 16px;
             border: none;
@@ -108,25 +88,10 @@
             justify-content: center;
             gap: 8px;
         }
-        
         .btn:active { transform: scale(0.96); }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #bb86fc 0%, #9955e8 100%);
-            color: #000;
-        }
-        
-        .btn-secondary {
-            background: linear-gradient(135deg, #03dac6 0%, #00b4a0 100%);
-            color: #000;
-        }
-        
-        .btn-full {
-            grid-column: 1 / -1;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
-            color: #fff;
-        }
-        
+        .btn-primary { background: linear-gradient(135deg, #bb86fc 0%, #9955e8 100%); color: #000; }
+        .btn-secondary { background: linear-gradient(135deg, #03dac6 0%, #00b4a0 100%); color: #000; }
+        .btn-full { grid-column: 1 / -1; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%); color: #fff; }
         .result {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 16px;
@@ -135,16 +100,8 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             display: none;
         }
-        
         .result.show { display: block; }
-        
-        .result-title {
-            font-size: 13px;
-            color: #bb86fc;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-        
+        .result-title { font-size: 13px; color: #bb86fc; margin-bottom: 8px; font-weight: 600; }
         .result-text {
             font-size: 14px;
             line-height: 1.6;
@@ -153,54 +110,18 @@
             max-height: 300px;
             overflow-y: auto;
         }
-        
-        .history {
-            margin-top: 24px;
-        }
-        
-        .history-title {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            color: #bb86fc;
-        }
-        
-        .history-item {
-            background: rgba(255, 255, 255, 0.05);
+        .btn-download-txt {
+            margin-top: 12px;
+            width: 100%;
             padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 8px;
-            font-size: 13px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .history-url {
-            flex: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            color: #aaa;
-        }
-        
-        .history-delete {
-            background: none;
+            background: linear-gradient(135deg, #ffd700 0%, #ffb700 100%);
+            color: #000;
             border: none;
-            color: #ff6b6b;
+            border-radius: 10px;
+            font-weight: 700;
             cursor: pointer;
-            padding: 4px 8px;
-            font-size: 18px;
         }
-        
-        .loading {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #bb86fc;
-            font-size: 14px;
-        }
-        
+        .loading { display: flex; align-items: center; gap: 10px; color: #bb86fc; font-size: 14px; }
         .spinner {
             width: 20px;
             height: 20px;
@@ -209,9 +130,7 @@
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
-        
         @keyframes spin { to { transform: rotate(360deg); } }
-        
         .toast {
             position: fixed;
             bottom: 20px;
@@ -226,9 +145,7 @@
             display: none;
             border: 1px solid rgba(187, 134, 252, 0.3);
         }
-        
         .toast.show { display: block; animation: slideUp 0.3s ease; }
-        
         @keyframes slideUp {
             from { transform: translate(-50%, 100px); opacity: 0; }
             to { transform: translate(-50%, 0); opacity: 1; }
@@ -258,28 +175,18 @@
         </div>
         
         <div class="actions">
-            <button class="btn btn-primary" onclick="downloadVideo('mp4')">
-                📥 MP4
-            </button>
-            <button class="btn btn-primary" onclick="downloadVideo('mp3')">
-                🎵 MP3
-            </button>
-            <button class="btn btn-secondary" onclick="transcribeVideo()">
-                📝 Transcrever
-            </button>
-            <button class="btn btn-full" onclick="clearHistory()">
-                🗑️ Limpar Histórico
-            </button>
+            <button class="btn btn-primary" onclick="downloadVideo('mp4')"> MP4</button>
+            <button class="btn btn-primary" onclick="downloadVideo('mp3')">🎵 MP3</button>
+            <button class="btn btn-secondary" onclick="transcribeVideo()">📝 Transcrever</button>
+            <button class="btn btn-secondary" onclick="downloadTranscription()">📄 Baixar TXT</button>
         </div>
         
         <div id="result" class="result">
             <div class="result-title">Resultado</div>
             <div id="resultText" class="result-text"></div>
-        </div>
-        
-        <div class="history">
-            <div class="history-title">📋 Histórico</div>
-            <div id="historyList"></div>
+            <button id="btnDownloadTxt" class="btn-download-txt" style="display:none;" onclick="downloadTranscription()">
+                📄 Baixar transcrição completa (.txt)
+            </button>
         </div>
     </div>
     
@@ -287,7 +194,6 @@
 
     <script>
         const API = "https://vdmtx-backend.onrender.com";
-        const STORAGE_KEY = 'vidmtx_history';
         
         function showToast(msg, duration = 3000) {
             const toast = document.getElementById('toast');
@@ -306,55 +212,14 @@
         
         function hideResult() {
             document.getElementById('result').classList.remove('show');
-        }
-        
-        function addToHistory(url, type) {
-            let history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            history.unshift({ url, type, date: new Date().toISOString() });
-            history = history.slice(0, 20);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-            renderHistory();
-        }
-        
-        function renderHistory() {
-            const history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            const list = document.getElementById('historyList');
-            
-            if (history.length === 0) {
-                list.innerHTML = '<div style="color: #666; font-size: 13px; text-align: center; padding: 20px;">Nenhum download recente</div>';
-                return;
-            }
-            
-            list.innerHTML = history.map((item, i) => `
-                <div class="history-item">
-                    <div class="history-url">${item.url}</div>
-                    <button class="history-delete" onclick="deleteHistory(${i})">×</button>
-                </div>
-            `).join('');
-        }
-        
-        function deleteHistory(index) {
-            let history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            history.splice(index, 1);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-            renderHistory();
-        }
-        
-        function clearHistory() {
-            localStorage.removeItem(STORAGE_KEY);
-            renderHistory();
-            showToast('Histórico limpo');
+            document.getElementById('btnDownloadTxt').style.display = 'none';
         }
         
         async function downloadVideo(format) {
             const url = document.getElementById('url').value.trim();
-            if (!url) {
-                showToast('⚠️ Cole um link primeiro');
-                return;
-            }
+            if (!url) { showToast('⚠️ Cole um link primeiro'); return; }
             
-            showResult('<div class="loading"><div class="spinner"></div>Processando...</div>');
-            addToHistory(url, format);
+            showResult('<div class="loading"><div class="spinner"></div>Processando (tentando múltiplas estratégias)...</div>');
             
             window.location.href = `${API}/download?url=${encodeURIComponent(url)}&format=${format}`;
             setTimeout(() => {
@@ -365,13 +230,9 @@
         
         async function transcribeVideo() {
             const url = document.getElementById('url').value.trim();
-            if (!url) {
-                showToast('⚠️ Cole um link primeiro');
-                return;
-            }
+            if (!url) { showToast('️ Cole um link primeiro'); return; }
             
             showResult('<div class="loading"><div class="spinner"></div>Baixando e transcrevendo...</div>');
-            addToHistory(url, 'transcribe');
             
             try {
                 const r = await fetch(`${API}/transcribe?url=${encodeURIComponent(url)}`);
@@ -383,13 +244,13 @@
                     return;
                 }
                 
-                if (d.text) {
-                    showResult('📝 <strong>Transcrição:</strong><br><br>' + d.text);
+                if (d.formatted) {
+                    showResult(' <strong>Transcrição:</strong><br><br>' + d.formatted);
+                    document.getElementById('btnDownloadTxt').style.display = 'block';
                     showToast('Transcrição concluída!');
                     
-                    // Copiar para área de transferência
-                    navigator.clipboard.writeText(d.text).then(() => {
-                        showToast('Texto copiado!');
+                    navigator.clipboard.writeText(d.formatted).then(() => {
+                        showToast('Texto copiado para área de transferência!');
                     }).catch(() => {});
                 }
             } catch(e) {
@@ -398,10 +259,15 @@
             }
         }
         
-        // Inicializar
-        renderHistory();
+        async function downloadTranscription() {
+            const url = document.getElementById('url').value.trim();
+            if (!url) { showToast('⚠️ Cole um link primeiro'); return; }
+            
+            showToast('⏳ Gerando arquivo TXT...');
+            window.location.href = `${API}/download-transcription?url=${encodeURIComponent(url)}`;
+            setTimeout(() => showToast('📄 Download do TXT iniciado!'), 2000);
+        }
         
-        // Enter para buscar
         document.getElementById('url').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') downloadVideo('mp4');
         });
