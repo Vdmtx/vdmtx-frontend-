@@ -2,38 +2,57 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0a0a0a">
-    <title>VidMTX - Downloader Pro</title>
+    <title>VidMTX - YouTube Downloader Pro</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
             background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
             color: #e0e0e0; 
             min-height: 100vh;
-            padding-bottom: 80px;
+            padding-bottom: 40px;
         }
         .header {
-            background: rgba(187, 134, 252, 0.1);
+            background: rgba(255, 0, 0, 0.15);
             backdrop-filter: blur(10px);
-            padding: 20px 16px;
-            border-bottom: 1px solid rgba(187, 134, 252, 0.2);
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 0, 0, 0.3);
             position: sticky;
             top: 0;
             z-index: 100;
         }
         .logo {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 800;
-            background: linear-gradient(135deg, #bb86fc 0%, #03dac6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #ff0000;
             text-align: center;
             letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
         }
-        .tagline { text-align: center; font-size: 12px; color: #888; margin-top: 4px; }
-        .container { padding: 16px; max-width: 600px; margin: 0 auto; }
+        .tagline { text-align: center; font-size: 13px; color: #888; margin-top: 6px; }
+        .container { padding: 20px; max-width: 700px; margin: 0 auto; }
+        
+        .alert {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            color: #fff;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            line-height: 1.5;
+            display: none;
+        }
+        .alert.show { display: block; }
+        .alert strong { display: block; margin-bottom: 8px; font-size: 14px; }
+        .alert ol { margin-left: 20px; margin-top: 8px; }
+        .alert li { margin-bottom: 4px; }
+        .alert a { color: #fff; text-decoration: underline; }
+        
         .input-group {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 16px;
@@ -41,7 +60,7 @@
             margin-bottom: 16px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        input {
+        input, textarea {
             width: 100%;
             padding: 16px;
             background: transparent;
@@ -51,35 +70,40 @@
             outline: none;
         }
         input::placeholder { color: #666; }
-        .platforms {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding: 8px 0;
+        textarea { 
+            min-height: 120px; 
+            font-family: monospace; 
+            font-size: 11px;
+            resize: vertical;
+            display: none;
+        }
+        textarea.show { display: block; }
+        
+        .cookies-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
             margin-bottom: 16px;
-            scrollbar-width: none;
+            width: 100%;
+            transition: all 0.2s;
         }
-        .platforms::-webkit-scrollbar { display: none; }
-        .platform-chip {
-            background: rgba(255, 255, 255, 0.08);
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            white-space: nowrap;
-            color: #aaa;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+        .cookies-toggle:hover { background: rgba(255, 255, 255, 0.15); }
+        
         .actions {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 12px;
+            margin-bottom: 12px;
         }
         .btn {
-            padding: 16px;
+            padding: 18px;
             border: none;
             border-radius: 12px;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
@@ -88,103 +112,135 @@
             justify-content: center;
             gap: 8px;
         }
-        .btn:active { transform: scale(0.96); }
-        .btn-primary { background: linear-gradient(135deg, #bb86fc 0%, #9955e8 100%); color: #000; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .btn:active { transform: translateY(0); }
+        .btn-youtube { background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%); color: #fff; }
         .btn-secondary { background: linear-gradient(135deg, #03dac6 0%, #00b4a0 100%); color: #000; }
-        .btn-full { grid-column: 1 / -1; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%); color: #fff; }
+        .btn-full { grid-column: 1 / -1; background: linear-gradient(135deg, #ffd700 0%, #ffb700 100%); color: #000; }
+        
         .result {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 16px;
-            padding: 16px;
-            margin-top: 16px;
+            padding: 20px;
+            margin-top: 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             display: none;
         }
         .result.show { display: block; }
-        .result-title { font-size: 13px; color: #bb86fc; margin-bottom: 8px; font-weight: 600; }
-        .result-text {
-            font-size: 14px;
-            line-height: 1.6;
-            color: #e0e0e0;
-            white-space: pre-wrap;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .btn-download-txt {
-            margin-top: 12px;
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #ffd700 0%, #ffb700 100%);
-            color: #000;
-            border: none;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .loading { display: flex; align-items: center; gap: 10px; color: #bb86fc; font-size: 14px; }
+        .result-title { font-size: 14px; color: #ff0000; margin-bottom: 12px; font-weight: 600; }
+        .result-text { font-size: 14px; line-height: 1.6; color: #e0e0e0; white-space: pre-wrap; max-height: 400px; overflow-y: auto; }
+        
+        .loading { display: flex; align-items: center; gap: 12px; color: #ff0000; font-size: 15px; }
         .spinner {
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(187, 134, 252, 0.3);
-            border-top-color: #bb86fc;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 0, 0, 0.3);
+            border-top-color: #ff0000;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+        
         .toast {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95);
             color: #fff;
-            padding: 12px 20px;
+            padding: 14px 24px;
             border-radius: 25px;
             font-size: 14px;
             z-index: 1000;
             display: none;
-            border: 1px solid rgba(187, 134, 252, 0.3);
+            border: 1px solid rgba(255, 0, 0, 0.5);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
         .toast.show { display: block; animation: slideUp 0.3s ease; }
         @keyframes slideUp {
             from { transform: translate(-50%, 100px); opacity: 0; }
             to { transform: translate(-50%, 0); opacity: 1; }
         }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+        .status-ok { background: #00c853; color: #000; }
+        .status-warn { background: #ffd700; color: #000; }
+        
+        .file-upload {
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            text-align: center;
+            cursor: pointer;
+            display: none;
+        }
+        .file-upload.show { display: block; }
+        .file-upload:hover { border-color: rgba(255, 0, 0, 0.5); }
+        .file-upload input { display: none; }
+        
+        @media (max-width: 600px) {
+            .logo { font-size: 24px; }
+            .btn { padding: 16px; font-size: 14px; }
+            .container { padding: 16px; }
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="logo">🎬 VidMTX</div>
-        <div class="tagline">Downloader Pro • Sem anúncios • Com transcrição</div>
+        <div class="logo">▶️ VidMTX <span id="cookiesStatus" class="status-badge status-warn">Sem cookies</span></div>
+        <div class="tagline">YouTube Downloader Pro • MP4/MP3/Transcrição • PC & Mobile</div>
     </div>
     
     <div class="container">
-        <div class="input-group">
-            <input type="url" id="url" placeholder="🔗 Cole o link do vídeo aqui..." autocomplete="off">
+        <div class="alert" id="cookieAlert">
+            <strong>⚠️ YouTube bloqueou o servidor</strong>
+            Para baixar vídeos do YouTube, você precisa adicionar cookies:<br>
+            <ol>
+                <li><strong>PC:</strong> Instale a extensão <a href="https://chromewebstore.google.com/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc" target="_blank">Get cookies.txt</a> no Chrome/Firefox</li>
+                <li><strong>Mobile:</strong> Use o Chrome e instale a mesma extensão</li>
+                <li>Acesse youtube.com e faça login (opcional mas recomendado)</li>
+                <li>Clique na extensão e exporte os cookies</li>
+                <li>Copie TODO o conteúdo ou use o botão abaixo para importar o arquivo</li>
+            </ol>
         </div>
         
-        <div class="platforms">
-            <div class="platform-chip">▶️ YouTube</div>
-            <div class="platform-chip">🎵 TikTok</div>
-            <div class="platform-chip">📷 Instagram</div>
-            <div class="platform-chip">🐦 Twitter</div>
-            <div class="platform-chip">📺 Bilibili</div>
-            <div class="platform-chip">🎬 Douyin</div>
-            <div class="platform-chip"> Kwai</div>
-            <div class="platform-chip">+1000</div>
+        <div class="input-group">
+            <input type="url" id="url" placeholder="🔗 Cole o link do YouTube aqui..." autocomplete="off">
+            <textarea id="cookies" placeholder="Cole aqui os cookies exportados (Netscape HTTP Cookie File...)"></textarea>
+        </div>
+        
+        <button class="cookies-toggle" onclick="toggleCookies()">
+            🍪 Adicionar Cookies do YouTube (obrigatório para YouTube)
+        </button>
+        
+        <div class="file-upload" id="fileUpload">
+            <label for="cookieFile">
+                📁 Ou importe o arquivo cookies.txt diretamente<br>
+                <small style="color: #888;">Clique aqui para selecionar</small>
+            </label>
+            <input type="file" id="cookieFile" accept=".txt" onchange="handleFileUpload(event)">
         </div>
         
         <div class="actions">
-            <button class="btn btn-primary" onclick="downloadVideo('mp4')"> MP4</button>
-            <button class="btn btn-primary" onclick="downloadVideo('mp3')">🎵 MP3</button>
-            <button class="btn btn-secondary" onclick="transcribeVideo()">📝 Transcrever</button>
+            <button class="btn btn-youtube" onclick="downloadVideo('mp4')">📥 Download MP4</button>
+            <button class="btn btn-youtube" onclick="downloadVideo('mp3')">🎵 Download MP3</button>
+            <button class="btn btn-secondary" onclick="transcribeVideo()">📝 Transcrever Áudio</button>
             <button class="btn btn-secondary" onclick="downloadTranscription()">📄 Baixar TXT</button>
         </div>
         
         <div id="result" class="result">
             <div class="result-title">Resultado</div>
             <div id="resultText" class="result-text"></div>
-            <button id="btnDownloadTxt" class="btn-download-txt" style="display:none;" onclick="downloadTranscription()">
+            <button id="btnDownloadTxt" class="btn btn-full" style="margin-top:16px;display:none;" onclick="downloadTranscription()">
                 📄 Baixar transcrição completa (.txt)
             </button>
         </div>
@@ -194,12 +250,55 @@
 
     <script>
         const API = "https://vdmtx-backend.onrender.com";
+        let hasCookies = false;
         
         function showToast(msg, duration = 3000) {
             const toast = document.getElementById('toast');
             toast.textContent = msg;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), duration);
+        }
+        
+        function toggleCookies() {
+            const textarea = document.getElementById('cookies');
+            const alert = document.getElementById('cookieAlert');
+            const fileUpload = document.getElementById('fileUpload');
+            
+            textarea.classList.toggle('show');
+            fileUpload.classList.toggle('show');
+            
+            if (textarea.classList.contains('show')) {
+                alert.classList.add('show');
+            } else {
+                alert.classList.remove('show');
+            }
+        }
+        
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('cookies').value = e.target.result;
+                    checkCookies();
+                    showToast('✅ Cookies importados com sucesso!');
+                };
+                reader.readAsText(file);
+            }
+        }
+        
+        function checkCookies() {
+            const cookies = document.getElementById('cookies').value.trim();
+            hasCookies = cookies.length > 100;
+            const badge = document.getElementById('cookiesStatus');
+            if (hasCookies) {
+                badge.textContent = 'Cookies OK';
+                badge.className = 'status-badge status-ok';
+            } else {
+                badge.textContent = 'Sem cookies';
+                badge.className = 'status-badge status-warn';
+            }
+            return cookies;
         }
         
         function showResult(msg, isError = false) {
@@ -210,67 +309,92 @@
             resultText.style.color = isError ? '#ff6b6b' : '#e0e0e0';
         }
         
-        function hideResult() {
-            document.getElementById('result').classList.remove('show');
-            document.getElementById('btnDownloadTxt').style.display = 'none';
-        }
-        
         async function downloadVideo(format) {
             const url = document.getElementById('url').value.trim();
-            if (!url) { showToast('⚠️ Cole um link primeiro'); return; }
+            const cookies = checkCookies();
             
-            showResult('<div class="loading"><div class="spinner"></div>Processando (tentando múltiplas estratégias)...</div>');
+            if (!url) { showToast('⚠️ Cole um link do YouTube'); return; }
+            if (!hasCookies) { 
+                showToast('⚠️ Adicione cookies primeiro'); 
+                toggleCookies();
+                return; 
+            }
             
-            window.location.href = `${API}/download?url=${encodeURIComponent(url)}&format=${format}`;
+            showResult('<div class="loading"><div class="spinner"></div>Baixando do YouTube...</div>');
+            
+            const params = new URLSearchParams({ url, format });
+            if (cookies) params.append('cookies', cookies);
+            
+            window.location.href = `${API}/download?${params.toString()}`;
             setTimeout(() => {
                 showResult('✅ Download iniciado! Verifique sua pasta de downloads.');
                 showToast('Download iniciado!');
-            }, 1500);
+            }, 2000);
         }
         
         async function transcribeVideo() {
             const url = document.getElementById('url').value.trim();
-            if (!url) { showToast('️ Cole um link primeiro'); return; }
+            const cookies = checkCookies();
             
-            showResult('<div class="loading"><div class="spinner"></div>Baixando e transcrevendo...</div>');
+            if (!url) { showToast('⚠️ Cole um link do YouTube'); return; }
+            if (!hasCookies) { 
+                showToast('⚠️ Adicione cookies primeiro'); 
+                toggleCookies();
+                return; 
+            }
+            
+            showResult('<div class="loading"><div class="spinner"></div>Baixando e transcrevendo (pode demorar)...</div>');
             
             try {
-                const r = await fetch(`${API}/transcribe?url=${encodeURIComponent(url)}`);
+                const params = new URLSearchParams({ url });
+                if (cookies) params.append('cookies', cookies);
+                
+                const r = await fetch(`${API}/transcribe?${params.toString()}`);
                 const d = await r.json();
                 
                 if (d.detail) {
-                    showResult(`❌ ${d.detail}`, true);
+                    showResult(` ${d.detail}`, true);
                     showToast('Erro na transcrição');
                     return;
                 }
                 
                 if (d.formatted) {
-                    showResult(' <strong>Transcrição:</strong><br><br>' + d.formatted);
+                    showResult('<strong>Transcrição:</strong><br><br>' + d.formatted);
                     document.getElementById('btnDownloadTxt').style.display = 'block';
-                    showToast('Transcrição concluída!');
-                    
-                    navigator.clipboard.writeText(d.formatted).then(() => {
-                        showToast('Texto copiado para área de transferência!');
-                    }).catch(() => {});
+                    showToast('Transcrição concluída! Texto copiado.');
+                    navigator.clipboard.writeText(d.formatted).catch(() => {});
                 }
             } catch(e) {
-                showResult('❌ Erro de conexão. Aguarde 30s e tente.', true);
+                showResult(' Erro de conexão. Aguarde 30s e tente.', true);
                 showToast('Erro de conexão');
             }
         }
         
         async function downloadTranscription() {
             const url = document.getElementById('url').value.trim();
-            if (!url) { showToast('⚠️ Cole um link primeiro'); return; }
+            const cookies = checkCookies();
+            
+            if (!url || !hasCookies) { showToast('⚠️ Preencha URL e cookies'); return; }
             
             showToast('⏳ Gerando arquivo TXT...');
-            window.location.href = `${API}/download-transcription?url=${encodeURIComponent(url)}`;
+            const params = new URLSearchParams({ url });
+            if (cookies) params.append('cookies', cookies);
+            
+            window.location.href = `${API}/download-transcription?${params.toString()}`;
             setTimeout(() => showToast('📄 Download do TXT iniciado!'), 2000);
         }
         
+        // Verifica cookies ao digitar
+        document.getElementById('cookies').addEventListener('input', checkCookies);
         document.getElementById('url').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') downloadVideo('mp4');
         });
+        
+        // Detecta se é mobile
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobile) {
+            document.querySelector('.tagline').textContent = 'YouTube Downloader Pro • MP4/MP3/Transcrição • Mobile';
+        }
     </script>
 </body>
 </html>
