@@ -10,40 +10,37 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
             background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
             color: #e0e0e0; 
-            min-height: 100vh;
             padding: 20px;
+            min-height: 100vh;
         }
         .container { max-width: 700px; margin: 0 auto; }
         .header {
             text-align: center;
             padding: 30px 0;
             border-bottom: 2px solid rgba(255,0,0,0.3);
-            margin-bottom: 30px;
         }
-        .logo { font-size: 36px; font-weight: 800; color: #ff0000; margin-bottom: 8px; }
-        .tagline { color: #888; font-size: 14px; }
+        .logo { font-size: 36px; font-weight: 800; color: #ff0000; }
         
         .alert {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+            background: #ff6b6b;
             color: #fff;
             padding: 20px;
             border-radius: 12px;
-            margin-bottom: 20px;
-            line-height: 1.6;
+            margin: 20px 0;
+            line-height: 1.8;
         }
-        .alert strong { display: block; margin-bottom: 10px; font-size: 16px; }
-        .alert ol { margin-left: 20px; }
-        .alert a { color: #fff; text-decoration: underline; }
+        .alert strong { font-size: 16px; display: block; margin-bottom: 10px; }
+        .alert a { color: #fff; }
         
+        label { display: block; margin: 15px 0 8px; font-weight: 600; color: #ff0000; }
         input, textarea {
             width: 100%;
             padding: 16px;
             background: rgba(255,255,255,0.05);
-            border: 2px solid rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
             border-radius: 12px;
             color: #fff;
             font-size: 15px;
-            margin-bottom: 15px;
         }
         input:focus, textarea:focus {
             outline: none;
@@ -53,9 +50,8 @@
             min-height: 150px; 
             font-family: monospace; 
             font-size: 11px;
-            display: none;
+            /* SEMPRE VISÍVEL - SEM display:none */
         }
-        textarea.show { display: block; }
         
         .btn {
             width: 100%;
@@ -65,11 +61,8 @@
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            margin-bottom: 12px;
-            transition: transform 0.2s;
+            margin: 10px 0;
         }
-        .btn:hover { transform: translateY(-2px); }
-        .btn:active { transform: translateY(0); }
         .btn-red { background: linear-gradient(135deg, #ff0000, #cc0000); color: #fff; }
         .btn-cyan { background: linear-gradient(135deg, #03dac6, #00b4a0); color: #000; }
         .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -80,22 +73,9 @@
             border-radius: 12px;
             margin-top: 20px;
             display: none;
-            border: 1px solid rgba(255,255,255,0.1);
         }
         .result.show { display: block; }
-        .result-title { color: #ff0000; font-weight: 600; margin-bottom: 12px; }
-        .result-text { white-space: pre-wrap; line-height: 1.6; }
-        
-        .status {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-left: 10px;
-        }
-        .status-ok { background: #00c853; color: #000; }
-        .status-warn { background: #ffd700; color: #000; }
+        .error { color: #ff6b6b; }
         
         .spinner {
             display: inline-block;
@@ -112,24 +92,22 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">▶️ VidMTX <span id="status" class="status status-warn">Sem cookies</span></div>
-            <div class="tagline">YouTube Downloader Pro • Invidious + yt-dlp</div>
+            <div class="logo">▶️ VidMTX</div>
         </div>
         
         <div class="alert">
             <strong> Cookies OBRIGATÓRIOS para YouTube:</strong>
-            <ol>
-                <li>Instale: <a href="https://chromewebstore.google.com/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc" target="_blank">Get cookies.txt</a></li>
-                <li>Acesse youtube.com e faça login</li>
-                <li>Clique na extensão → Exportar cookies</li>
-                <li>Copie TODO o conteúdo OU importe o arquivo</li>
-                <li>Cole no campo abaixo</li>
-            </ol>
+            1. Instale: <a href="https://chromewebstore.google.com/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc" target="_blank">Get cookies.txt</a><br>
+            2. Acesse youtube.com e faça login<br>
+            3. Clique na extensão → Exportar cookies<br>
+            4. Copie TODO o conteúdo e cole abaixo
         </div>
         
-        <input type="url" id="url" placeholder="🔗 https://youtube.com/watch?v=...">
+        <label>URL do YouTube:</label>
+        <input type="url" id="url" placeholder="https://youtube.com/watch?v=...">
         
-        <textarea id="cookies" placeholder="Cole os cookies aqui (Netscape HTTP Cookie File...)"></textarea>
+        <label>Cookies (obrigatório - cole o conteúdo do arquivo cookies.txt):</label>
+        <textarea id="cookies" placeholder=".youtube.com	TRUE	/	TRUE	1234567890	__Secure-3PAPISID	abc123..."></textarea>
         
         <div class="btn-row">
             <button class="btn btn-red" onclick="download('mp4')">📥 Download MP4</button>
@@ -146,35 +124,19 @@
     <script>
         const API = "https://vdmtx-backend.onrender.com";
         
-        function checkCookies() {
-            const cookies = document.getElementById('cookies').value;
-            const status = document.getElementById('status');
-            if (cookies.length > 500) {
-                status.textContent = 'Cookies OK';
-                status.className = 'status status-ok';
-            } else {
-                status.textContent = 'Sem cookies';
-                status.className = 'status status-warn';
-            }
-            return cookies;
-        }
-        
         function showResult(msg, err=false) {
             const r = document.getElementById('result');
             r.classList.add('show');
-            r.innerHTML = `<div class="result-title">${err ? ' Erro' : '✅ Resultado'}</div><div class="result-text">${msg}</div>`;
+            r.innerHTML = msg;
+            r.className = 'result ' + (err ? 'error' : '');
         }
         
         async function download(fmt) {
             const url = document.getElementById('url').value.trim();
-            const cookies = checkCookies();
+            const cookies = document.getElementById('cookies').value.trim();
             
-            if (!url) return alert('Cole uma URL do YouTube');
-            if (cookies.length < 500) {
-                alert('⚠️ Cole os cookies primeiro (campo abaixo)');
-                document.getElementById('cookies').classList.add('show');
-                return;
-            }
+            if (!url) { alert('Cole a URL do YouTube'); return; }
+            if (cookies.length < 100) { alert('Cole os cookies primeiro (campo acima)'); return; }
             
             showResult('<span class="spinner"></span>Processando...');
             
@@ -191,54 +153,44 @@
                     a.href = URL.createObjectURL(blob);
                     a.download = `video.${fmt}`;
                     a.click();
-                    showResult('Download iniciado! Verifique sua pasta de downloads.');
+                    showResult('✅ Download concluído!');
                 } else {
                     const e = await r.json();
-                    showResult(e.detail, true);
+                    showResult('❌ ' + e.detail, true);
                 }
             } catch(e) {
-                showResult('Erro de conexão', true);
+                showResult('❌ Erro de conexão', true);
             }
         }
         
         async function transcribe() {
             const url = document.getElementById('url').value.trim();
-            const cookies = checkCookies();
+            const cookies = document.getElementById('cookies').value.trim();
             
-            if (!url || cookies.length < 500) {
-                alert('Preencha URL e cookies');
-                return;
-            }
+            if (!url || cookies.length < 100) { alert('Preencha URL e cookies'); return; }
             
-            showResult('<span class="spinner"></span>Baixando e transcrevendo...');
+            showResult('<span class="spinner"></span>Transcrevendo...');
             
-            try {
-                const r = await fetch(`${API}/transcribe`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({url, format: 'mp3', cookies})
-                });
-                
-                const d = await r.json();
-                if (d.formatted) {
-                    showResult(`<strong>Transcrição:</strong><br><br>${d.formatted}`);
-                    navigator.clipboard.writeText(d.formatted);
-                } else if (d.detail) {
-                    showResult(d.detail, true);
-                }
-            } catch(e) {
-                showResult('Erro de conexão', true);
+            const r = await fetch(`${API}/transcribe`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({url, format: 'mp3', cookies})
+            });
+            
+            const d = await r.json();
+            if (d.formatted) {
+                showResult('<strong>Transcrição:</strong><br><br>' + d.formatted);
+                navigator.clipboard.writeText(d.formatted);
+            } else {
+                showResult('❌ ' + (d.detail || 'Erro'), true);
             }
         }
         
         async function downloadTxt() {
             const url = document.getElementById('url').value.trim();
-            const cookies = checkCookies();
+            const cookies = document.getElementById('cookies').value.trim();
             
-            if (!url || cookies.length < 500) {
-                alert('Preencha URL e cookies');
-                return;
-            }
+            if (!url || cookies.length < 100) { alert('Preencha URL e cookies'); return; }
             
             const r = await fetch(`${API}/download-transcription`, {
                 method: 'POST',
@@ -254,8 +206,6 @@
                 a.click();
             }
         }
-        
-        document.getElementById('cookies').addEventListener('input', checkCookies);
     </script>
 </body>
 </html>
